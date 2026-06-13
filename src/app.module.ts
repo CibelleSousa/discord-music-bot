@@ -5,6 +5,7 @@ import { IntentsBitField } from 'discord.js';
 import { PingCommand } from './ping.command';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Entities } from './database';
+import { AudioModule } from './audio/audio.module';
 
 @Module({
   imports: [
@@ -37,7 +38,8 @@ import { Entities } from './database';
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([Entities.Guild, Entities.User, Entities.Track, Entities.Playlist])
+    TypeOrmModule.forFeature([Entities.Guild, Entities.User, Entities.Track, Entities.Playlist]),
+    AudioModule
   ],
   controllers: [],
   providers: [PingCommand],
