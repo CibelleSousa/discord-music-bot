@@ -36,6 +36,7 @@ import { AudioModule } from './audio/audio.module';
           IntentsBitField.Flags.GuildMessages,
           IntentsBitField.Flags.GuildVoiceStates,
         ],
+        development: [configService.getOrThrow<string>('DISCORD_DEV_GUILD_ID')]
       }),
       inject: [ConfigService],
     }),
@@ -43,6 +44,6 @@ import { AudioModule } from './audio/audio.module';
     AudioModule
   ],
   controllers: [],
-  providers: [PingCommand, Commands.PlayCommand],
+  providers: [PingCommand, Commands.PlayCommand, Commands.StopCommand],
 })
 export class AppModule {}
