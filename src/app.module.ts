@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { NecordModule } from 'necord';
 import { IntentsBitField } from 'discord.js';
 import { PingCommand } from './ping.command';
+import { Commands } from './commands';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Entities } from './database';
 import { AudioModule } from './audio/audio.module';
@@ -42,6 +43,6 @@ import { AudioModule } from './audio/audio.module';
     AudioModule
   ],
   controllers: [],
-  providers: [PingCommand],
+  providers: [PingCommand, Commands.PlayCommand],
 })
 export class AppModule {}
