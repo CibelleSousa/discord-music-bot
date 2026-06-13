@@ -21,7 +21,7 @@ export class StopCommand {
         });
         }
 
-        // 2. Busca o reprodutor de áudio (player) ativo neste servidor
+        // Busca o reprodutor de áudio (player) ativo neste servidor
         const player = this.audioService.shoukaku.players.get(interaction.guildId!);
 
         if (!player) {
@@ -31,7 +31,12 @@ export class StopCommand {
         });
         }
 
-        // 3. Destrói o player. Isso encerra a conexão de voz e para qualquer áudio imediatamente.
+        // Pega a fila e limpa tudo
+        const queue = this.audioService.getQueue(interaction.guildId!);
+        queue.tracks = [];
+        queue.currentTrack = null;
+
+        // Destrói o player. Isso encerra a conexão de voz e para qualquer áudio imediatamente.
         await this.audioService.shoukaku.leaveVoiceChannel(interaction.guildId!);
 
         return interaction.reply('⏹️ O som foi cortado e eu saí do canal. Paz e silêncio restaurados!');

@@ -2,6 +2,7 @@ import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Shoukaku, Connectors } from 'shoukaku';
 import { Client } from 'discord.js';
+import { Queue } from './queue';
 
 @Injectable()
 export class AudioService implements OnModuleInit {
@@ -11,10 +12,21 @@ export class AudioService implements OnModuleInit {
     // Um logger nativo do NestJS para deixar as mensagens bonitas no terminal
     private readonly logger = new Logger(AudioService.name);
 
+    // Cria o mapa de filas (ID do Servidor -> Fila)
+    public readonly queues = new Map<string, Queue>();
+
     constructor(
         private readonly client: Client,
         private readonly configService: ConfigService,
     ) {}
+
+    // Método para pegar ou criar a fila de um servidor
+    public getQueue(guildId: string): Queue {
+        if(!this.queues.has(guildId)) {
+            this.queues.set(guildId, new Queue());
+        }
+        return this.queues.get(guildId)!;
+    }
 
     // Esse método roda automaticamente assim que o bot liga
     onModuleInit() {

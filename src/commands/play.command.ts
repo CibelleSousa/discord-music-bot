@@ -23,7 +23,7 @@ export class PlayCommand {
     @Context() [interaction]: SlashCommandContext,
     @Options() { query }: PlayDto,
   ) {
-    // 1. Verificação de segurança: O usuário está em um canal de voz?
+    // Verificação de segurança: O usuário está em um canal de voz?
     const member = interaction.member as GuildMember;
     const voiceChannel = member.voice.channel;
 
@@ -51,25 +51,52 @@ export class PlayCommand {
       return interaction.editReply('❌ Nenhuma música encontrada com esse nome.');
     }
 
-    // Extrai a primeira música do resultado (dependendo se é playlist ou pesquisa)
-    let track;
+    // Pega a fila do servidor atual
+    const guildId = interaction.guildId!;
+    const queue = this.audioService.getQueue(guildId);
+
+    // Separa a lógica de Playlist e Música única
+    let responseText = '';
+
     if (result.loadType === 'playlist') {
-      track = result.data.tracks[0];
-    } else if (result.loadType === 'search') {
-      track = result.data[0];
+      // Se for uma playlist, adiciona todas as musicas na fila
+      for (const track of result.data.tracks) {
+        queue.enqueue(track);
+      }
+      responseText = `📚 Adicionando a playlist **${result.data.info.name}** com **${result.data.tracks.length} músicas na fila!**`;
     } else {
-      track = result.data; // É um link direto
+      // Se for uma única musica ou pesquisa, pega só a primeira
+      const track = result.loadType === 'search' ? result.data[0] : result.data;
+      queue.enqueue(track);
+      responseText = `🎵 Adicionado à fila: **${track.info.title}**`;
     }
 
-    // 4. Entra no canal de voz e toca a música
-    const player = await this.audioService.shoukaku.joinVoiceChannel({
-      guildId: interaction.guildId!,
-      channelId: voiceChannel.id,
-      shardId: 0, // O Discord divide os bots grandes em "shards", padrão é 0
-    });
+    // verifica se já existe um player rodando neste servidor
+    let player = this.audioService.shoukaku.players.get(guildId);
 
-    await player.playTrack({ track: { encoded: track.encoded } });
+    // Se o bot ainda não estiver no canal de voz, ele entra e configura o piloto automático
+    if (!player) {
+      player = await this.audioService.shoukaku.joinVoiceChannel({
+        guildId: guildId,
+        channelId: voiceChannel.id,
+        shardId: 0
+      });
 
-    return interaction.editReply(`🎶 Tocando agora: **${track.info.title}**`);
+      // Quando uma música acabar, puxa a próxima da fila e toca
+      player.on('end', () => {
+        const nextTrack = queue.next();
+        if (nextTrack) {
+          player!.playTrack({ track: {encoded: nextTrack.encoded } });
+        }
+      });
+    }
+
+    // Se a fila estava parada, damos início ao motor
+    if (!queue.currentTrack) {
+      const nextTrack = queue.next();
+      await player.playTrack({ track: {encoded: nextTrack.encoded } });
+    }
+
+    return interaction.editReply(responseText);
   }
 }
