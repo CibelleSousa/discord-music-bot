@@ -4,7 +4,7 @@ import { NecordModule } from 'necord';
 import { IntentsBitField } from 'discord.js';
 import { PingCommand } from './ping.command';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Guild } from './database/entities/guild.entity';
+import { Entities } from './database';
 
 @Module({
   imports: [
@@ -37,7 +37,7 @@ import { Guild } from './database/entities/guild.entity';
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([Guild])
+    TypeOrmModule.forFeature([Entities.Guild, Entities.User, Entities.Track, Entities.Playlist])
   ],
   controllers: [],
   providers: [PingCommand],
