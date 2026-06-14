@@ -33,6 +33,7 @@ export class StopCommand {
 
         // Pega a fila e limpa tudo
         const queue = this.audioService.getQueue(interaction.guildId!);
+        queue.isManualStop = true;
         queue.tracks = [];
         queue.currentTrack = null;
 

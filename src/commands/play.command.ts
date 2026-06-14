@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Context, Options, SlashCommand, StringOption } from 'necord';
 import type { SlashCommandContext } from 'necord';
-import { GuildMember } from 'discord.js';
+import { GuildMember, TextChannel } from 'discord.js';
 import { AudioService } from '../audio/audio.service';
 
 // Define o que o usuário precisa digitar no Discord
@@ -23,7 +23,7 @@ export class PlayCommand {
     @Context() [interaction]: SlashCommandContext,
     @Options() { query }: PlayDto,
   ) {
-    // Verificação de segurança: O usuário está em um canal de voz?
+    //  Verificação de segurança: O usuário está em um canal de voz?
     const member = interaction.member as GuildMember;
     const voiceChannel = member.voice.channel;
 
@@ -54,16 +54,42 @@ export class PlayCommand {
     // Pega a fila do servidor atual
     const guildId = interaction.guildId!;
     const queue = this.audioService.getQueue(guildId);
+    queue.isManualStop = false;
+
+    // Salva o canal atual na fila e cancela qualquer cronometro de inatividade
+    queue.textChannel = interaction.channel;
+    queue.requesterId = interaction.user.id;
+    if (queue.timeout) {
+      clearTimeout(queue.timeout);
+      queue.timeout =  null;
+    }
 
     // Separa a lógica de Playlist e Música única
     let responseText = '';
 
+    // Se for uma playlist, adiciona todas as musicas na fila
     if (result.loadType === 'playlist') {
-      // Se for uma playlist, adiciona todas as musicas na fila
-      for (const track of result.data.tracks) {
+      // Filtra videos fantasmas 
+      const validTracks = result.data.tracks.filter((track: any) => {
+        const title = track.info.title.toLowerCase();
+        const isGhostTitle = title.includes('private') || 
+                             title.includes('deleted') || 
+                             title.includes('privado') || 
+                             title.includes('indisponível') || 
+                             title.includes('unavailable');
+        return track.info.length > 0 && !isGhostTitle;
+      });
+      
+      for (const track of validTracks) {
         queue.enqueue(track);
       }
       responseText = `📚 Adicionando a playlist **${result.data.info.name}** com **${result.data.tracks.length} músicas na fila!**`;
+
+      const hiddenCount = result.data.tracks.length - validTracks.length;
+      if (hiddenCount > 0) {
+        responseText += `*Ignoramos ${hiddenCount} faixas ocultas/excluídas*.`
+      }
+
     } else {
       // Se for uma única musica ou pesquisa, pega só a primeira
       const track = result.loadType === 'search' ? result.data[0] : result.data;
@@ -84,9 +110,31 @@ export class PlayCommand {
 
       // Quando uma música acabar, puxa a próxima da fila e toca
       player.on('end', () => {
+        // Verifica se é um stop disparado pelo comando /stop
+        if (queue.isManualStop) return;
+
         const nextTrack = queue.next();
         if (nextTrack) {
           player!.playTrack({ track: {encoded: nextTrack.encoded } });
+        } else {
+          if (queue.textChannel) {
+            const ping = queue.requesterId ? `<@${queue.requesterId}>` : '';
+            queue.textChannel.send(`🏁 ${ping} A fila de músicas acabou! O bot será desconectado em **2 minutos** por inatividade.`);
+          }
+
+          queue.timeout = setTimeout(async () => {
+            const currentPlayer = this.audioService.shoukaku.players.get(guildId);
+            if (currentPlayer) {
+              queue.tracks = [];
+              queue.currentTrack = null;
+              await this.audioService.shoukaku.leaveVoiceChannel(guildId);
+
+              if (queue.textChannel) {
+                queue.textChannel.send('💤 Fiquei inativo por muito tempo e me desconectei. Até a próxima!');
+              }
+
+            }
+          }, 2 * 60 * 1000);
         }
       });
     }

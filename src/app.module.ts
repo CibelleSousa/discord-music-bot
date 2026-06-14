@@ -44,6 +44,12 @@ import { AudioModule } from './audio/audio.module';
     AudioModule
   ],
   controllers: [],
-  providers: [PingCommand, Commands.PlayCommand, Commands.StopCommand],
+  providers: [ 
+    PingCommand,
+    Commands.PlayCommand,
+    Commands.StopCommand,
+    Commands.QueueCommand,
+    Commands.SkipCommand 
+  ],
 })
 export class AppModule {}
