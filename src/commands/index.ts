@@ -6,6 +6,7 @@ import { PauseCommand } from "./pause.commands";
 import { ResumeCommand } from "./resume.command";
 import { JoinCommand } from "./join.command";
 import { DisconnectCommand } from "./disconnect.command";
+import { NowPlayingCommand } from "./nowplaying.command";
 
 export const Commands = {
     PlayCommand,
@@ -15,5 +16,6 @@ export const Commands = {
     PauseCommand,
     ResumeCommand,
     JoinCommand,
-    DisconnectCommand
+    DisconnectCommand,
+    NowPlayingCommand
 }

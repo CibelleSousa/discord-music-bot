@@ -109,9 +109,12 @@ export class PlayCommand {
       });
 
       // Quando uma música acabar, puxa a próxima da fila e toca
-      player.on('end', () => {
-        // Verifica se é um stop disparado pelo comando /stop
-        if (queue.isManualStop) return;
+      player.on('end', (data) => {
+        console.debug(`[Lavalink] A faixa parou. Motivo: ${data.reason}`);
+
+        // Verifica se é um stop disparado pelo comando /stop ou se a música foi apenas "substituída" por outra
+        if (queue.isManualStop || data.reason === 'replaced') return;
+        
 
         const nextTrack = queue.next();
         if (nextTrack) {

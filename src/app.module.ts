@@ -53,7 +53,8 @@ import { AudioModule } from './audio/audio.module';
     Commands.PauseCommand,
     Commands.ResumeCommand,
     Commands.JoinCommand,
-    Commands.DisconnectCommand
+    Commands.DisconnectCommand,
+    Commands.NowPlayingCommand
   ],
 })
 export class AppModule {}
