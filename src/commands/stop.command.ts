@@ -37,9 +37,9 @@ export class StopCommand {
         queue.tracks = [];
         queue.currentTrack = null;
 
-        // Destrói o player. Isso encerra a conexão de voz e para qualquer áudio imediatamente.
-        await this.audioService.shoukaku.leaveVoiceChannel(interaction.guildId!);
+        // Para a faixa atual, mas não desconecta do canal.
+        await player.stopTrack();
 
-        return interaction.reply('⏹️ O som foi cortado e eu saí do canal. Paz e silêncio restaurados!');
+        return interaction.reply('⏹️ O som foi cortado e a fila foi limpa. Paz e silêncio restaurados!');
     }
 }

@@ -49,7 +49,11 @@ import { AudioModule } from './audio/audio.module';
     Commands.PlayCommand,
     Commands.StopCommand,
     Commands.QueueCommand,
-    Commands.SkipCommand 
+    Commands.SkipCommand ,
+    Commands.PauseCommand,
+    Commands.ResumeCommand,
+    Commands.JoinCommand,
+    Commands.DisconnectCommand
   ],
 })
 export class AppModule {}
