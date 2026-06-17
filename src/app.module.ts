@@ -3,8 +3,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { NecordModule } from 'necord';
 import { IntentsBitField } from 'discord.js';
 import { PingCommand } from './ping.command';
+import { Commands } from './commands';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Entities } from './database';
+import { AudioModule } from './audio/audio.module';
 
 @Module({
   imports: [
@@ -34,12 +36,20 @@ import { Entities } from './database';
           IntentsBitField.Flags.GuildMessages,
           IntentsBitField.Flags.GuildVoiceStates,
         ],
+        development: [configService.getOrThrow<string>('DISCORD_DEV_GUILD_ID')]
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([Entities.Guild, Entities.User, Entities.Track, Entities.Playlist])
+    TypeOrmModule.forFeature([Entities.Guild, Entities.User, Entities.Track, Entities.Playlist]),
+    AudioModule
   ],
   controllers: [],
-  providers: [PingCommand],
+  providers: [ 
+    PingCommand,
+    Commands.PlayCommand,
+    Commands.StopCommand,
+    Commands.QueueCommand,
+    Commands.SkipCommand 
+  ],
 })
 export class AppModule {}

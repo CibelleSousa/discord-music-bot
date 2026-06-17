@@ -14,5 +14,14 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  lavalink:
+    image: ghcr.io/lavalink-devs/lavalink:4
+    container_name: musicbot-lavalink
+    restart: always
+    ports:
+      - '2333:2333'
+    volumes:
+      - ./lavalink/application.yml:/opt/Lavalink/application.yml
+
 volumes:
   pgdata:
