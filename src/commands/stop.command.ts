@@ -13,31 +13,31 @@ export class StopCommand {
         const member = interaction.member as GuildMember;
         const voiceChannel = member.voice.channel;
 
-        // 1. Verifica se o usuário está no canal de voz
+        
         if (!voiceChannel) {
-        return interaction.reply({ 
-            content: '❌ Você precisa estar em um canal de voz para me parar!', 
-            ephemeral: true 
-        });
+            return interaction.reply({ 
+                content: '❌ Você precisa estar em um canal de voz para me parar!', 
+                ephemeral: true 
+            });
         }
 
-        // Busca o reprodutor de áudio (player) ativo neste servidor
+        
         const player = this.audioService.shoukaku.players.get(interaction.guildId!);
 
         if (!player) {
-        return interaction.reply({ 
-            content: '❌ Eu não estou tocando nada no momento.', 
-            ephemeral: true 
-        });
+            return interaction.reply({ 
+                content: '❌ Eu não estou tocando nada no momento.', 
+                ephemeral: true 
+            });
         }
 
-        // Pega a fila e limpa tudo
+        
         const queue = this.audioService.getQueue(interaction.guildId!);
         queue.isManualStop = true;
         queue.tracks = [];
         queue.currentTrack = null;
 
-        // Para a faixa atual, mas não desconecta do canal.
+        
         await player.stopTrack();
 
         return interaction.reply('⏹️ O som foi cortado e a fila foi limpa. Paz e silêncio restaurados!');
