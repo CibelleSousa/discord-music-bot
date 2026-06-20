@@ -7,6 +7,11 @@ import { ResumeCommand } from "./resume.command";
 import { JoinCommand } from "./join.command";
 import { DisconnectCommand } from "./disconnect.command";
 import { NowPlayingCommand } from "./nowplaying.command";
+import { ClearCommand } from "./clear.command";
+import { ShuffleCommand } from "./shuffle.command";
+import { UnshuffleCommand } from "./unshuffle.command";
+import { MoveCommand } from "./move.command";
+import { JumpCommand } from "./jump.command";
 
 export const Commands = {
     PlayCommand,
@@ -17,5 +22,10 @@ export const Commands = {
     ResumeCommand,
     JoinCommand,
     DisconnectCommand,
-    NowPlayingCommand
+    NowPlayingCommand,
+    ClearCommand,
+    ShuffleCommand,
+    UnshuffleCommand,
+    MoveCommand,
+    JumpCommand
 }

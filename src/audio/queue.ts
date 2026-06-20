@@ -5,6 +5,8 @@ export class Queue {
   public timeout: NodeJS.Timeout | null;
   public isManualStop: boolean;
   public requesterId: string | null;
+  public isShuffled: boolean;
+  public unshffledTracks: any[];
 
   constructor() {
     this.tracks = [];
@@ -13,6 +15,8 @@ export class Queue {
     this.timeout = null;
     this.isManualStop = false;
     this.requesterId = null;
+    this.isShuffled =  false;
+    this.unshffledTracks = [];
   }
 
   public enqueue (track: any): void {
@@ -29,5 +33,23 @@ export class Queue {
     this.currentTrack = nextTrack;
 
     return nextTrack;
+  }
+
+  public enabledShuffle(): void {
+    if(this.isShuffled) return;
+    this.unshffledTracks = [...this.tracks];
+    this.isShuffled = true;
+  }
+
+  public disableShuffle(): void {
+    if (!this.isShuffled) return;
+
+    const remainingOriginals = this.unshffledTracks.filter(track => this.tracks.includes(track));
+    const newTracks = this.tracks.filter(track => !this.unshffledTracks.includes(track));
+
+    this.tracks = [...remainingOriginals, ...newTracks];
+
+    this.isShuffled = false;
+    this.unshffledTracks = [];
   }
 }
