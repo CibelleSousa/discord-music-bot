@@ -61,6 +61,7 @@ import { PlayerComponents } from './audio/player.components';
     Commands.UnshuffleCommand,
     Commands.MoveCommand,
     Commands.JumpCommand,
+    Commands.LoopCommand,
     PlayerComponents
   ],
 })

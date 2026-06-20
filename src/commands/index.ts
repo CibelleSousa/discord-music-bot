@@ -12,6 +12,7 @@ import { ShuffleCommand } from "./shuffle.command";
 import { UnshuffleCommand } from "./unshuffle.command";
 import { MoveCommand } from "./move.command";
 import { JumpCommand } from "./jump.command";
+import { LoopCommand } from "./loop.command";
 
 export const Commands = {
     PlayCommand,
@@ -27,5 +28,6 @@ export const Commands = {
     ShuffleCommand,
     UnshuffleCommand,
     MoveCommand,
-    JumpCommand
+    JumpCommand,
+    LoopCommand
 }

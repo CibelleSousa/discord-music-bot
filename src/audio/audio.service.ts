@@ -56,7 +56,7 @@ export class AudioService implements OnModuleInit {
 
         let description = '';
         if (queue.requesterId) {
-            description += `👤 **Adicionado por:** <@${queue.requesterId}>\n`;
+            description += `Adicionado por <@${queue.requesterId}>\n`;
         }
         description += `⏱️ **Duração:** \`${duration}\``;
         embed.setDescription(description);
