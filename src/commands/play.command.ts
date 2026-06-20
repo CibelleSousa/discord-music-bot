@@ -34,6 +34,9 @@ export class PlayCommand {
       });
     }
 
+    const queue = this.audioService.getQueue(interaction.guildId!);
+    queue.voiceChannelId = voiceChannel.id;
+
     // Avisamos ao Discord que estamos processando (evita que o comando dê "falha ao responder")
     await interaction.deferReply();
 
@@ -53,7 +56,6 @@ export class PlayCommand {
 
     // Pega a fila do servidor atual
     const guildId = interaction.guildId!;
-    const queue = this.audioService.getQueue(guildId);
     queue.isManualStop = false;
 
     // Salva o canal atual na fila e cancela qualquer cronometro de inatividade
@@ -157,9 +159,18 @@ export class PlayCommand {
       const nextTrack = queue.next();
       await player.playTrack({ track: {encoded: nextTrack.encoded } });
 
-      const ui = this.audioService.buildPlayerUi(nextTrack, false, queue);
+      const ui = this.audioService.buildPlayerUi(nextTrack, player, queue);
       const msg = await queue.textChannel.send(ui);
       queue.playerMessage = msg;
+      if (queue.uiInterval) {
+        clearInterval(queue.uiInterval);
+      }
+      queue.uiInterval = setInterval(async () => {
+        if (queue.playerMessage && player && !player.paused) {
+          const updateUi = this.audioService.buildPlayerUi(queue.currentTrack, player, queue);
+          await queue.playerMessage.edit(updateUi).catch(() => {});
+        }
+      }, 10000);
     }
 
     return interaction.editReply(responseText);

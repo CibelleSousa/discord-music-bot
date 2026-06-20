@@ -19,7 +19,7 @@ export class PlayerComponents {
         const isPaused = !player.paused;
         await player.setPaused(isPaused);
 
-        const ui = this.audioService.buildPlayerUi(queue.currentTrack, isPaused, queue);
+        const ui = this.audioService.buildPlayerUi(queue.currentTrack, player, queue);
 
         await interaction.update(ui);
     }
@@ -95,7 +95,7 @@ export class PlayerComponents {
             }
         }
 
-        const ui = this.audioService.buildPlayerUi(queue.currentTrack, player.paused, queue);
+        const ui = this.audioService.buildPlayerUi(queue.currentTrack, player, queue);
         await interaction.update(ui);
     }
 
@@ -114,7 +114,7 @@ export class PlayerComponents {
             queue.loopMode = 'off';
         }
 
-        const ui = this.audioService.buildPlayerUi(queue.currentTrack, player.paused, queue);
+        const ui = this.audioService.buildPlayerUi(queue.currentTrack, player, queue);
         await interaction.update(ui);
     }
 }

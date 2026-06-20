@@ -12,6 +12,8 @@ export class Queue {
   public playerMessage: Message | null;
   public loopMode: 'off' | 'queue' | 'song';
   public history: any[];
+  public voiceChannelId: string | null;
+  public uiInterval: NodeJS.Timeout | null;
 
   constructor() {
     this.tracks = [];
@@ -25,6 +27,8 @@ export class Queue {
     this.playerMessage = null;
     this.loopMode = 'off';
     this.history = [];
+    this.voiceChannelId = null;
+    this.uiInterval = null;
   }
 
   public enqueue (track: any): void {
