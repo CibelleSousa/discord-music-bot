@@ -109,7 +109,7 @@ export class PlayCommand {
       });
 
       // Quando uma música acabar, puxa a próxima da fila e toca
-      player.on('end', (data) => {
+      player.on('end', async (data) => {
         console.debug(`[Lavalink] A faixa parou. Motivo: ${data.reason}`);
 
         // Verifica se é um stop disparado pelo comando /stop ou se a música foi apenas "substituída" por outra
@@ -119,7 +119,17 @@ export class PlayCommand {
         const nextTrack = queue.next();
         if (nextTrack) {
           player!.playTrack({ track: {encoded: nextTrack.encoded } });
+          if (queue.playerMessage) {
+            await queue.playerMessage.delete().catch(() => {});
+          }
+          const ui = this.audioService.buildPlayerUi(nextTrack, false, queue.requesterId);
+          const msg = await queue.textChannel.send(ui);
+          queue.playerMessage = msg;
         } else {
+          if (queue.playerMessage) {
+            await queue.playerMessage.delete().catch(() => {});
+            queue.playerMessage = null;
+          }
           if (queue.textChannel) {
             const ping = queue.requesterId ? `<@${queue.requesterId}>` : '';
             queue.textChannel.send(`🏁 ${ping} A fila de músicas acabou! O bot será desconectado em **2 minutos** por inatividade.`);
@@ -146,6 +156,10 @@ export class PlayCommand {
     if (!queue.currentTrack) {
       const nextTrack = queue.next();
       await player.playTrack({ track: {encoded: nextTrack.encoded } });
+
+      const ui = this.audioService.buildPlayerUi(nextTrack, false);
+      const msg = await queue.textChannel.send(ui);
+      queue.playerMessage = msg;
     }
 
     return interaction.editReply(responseText);

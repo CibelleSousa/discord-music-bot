@@ -37,7 +37,11 @@ export class StopCommand {
         queue.tracks = [];
         queue.currentTrack = null;
 
-        
+        if (queue.playerMessage) {
+            await queue.playerMessage.delete().catch(() => {});
+            queue.playerMessage = null;
+        }
+
         await player.stopTrack();
 
         return interaction.reply('⏹️ O som foi cortado e a fila foi limpa. Paz e silêncio restaurados!');

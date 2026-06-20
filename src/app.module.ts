@@ -7,6 +7,7 @@ import { Commands } from './commands';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Entities } from './database';
 import { AudioModule } from './audio/audio.module';
+import { PlayerComponents } from './audio/player.components';
 
 @Module({
   imports: [
@@ -59,7 +60,8 @@ import { AudioModule } from './audio/audio.module';
     Commands.ShuffleCommand,
     Commands.UnshuffleCommand,
     Commands.MoveCommand,
-    Commands.JumpCommand
+    Commands.JumpCommand,
+    PlayerComponents
   ],
 })
 export class AppModule {}

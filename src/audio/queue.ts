@@ -1,3 +1,5 @@
+import { Message } from 'discord.js';
+
 export class Queue {
   public tracks: any[]; // Usaremos 'any' por enquanto, depois tipamos com a música do Lavalink
   public currentTrack: any | null;
@@ -7,6 +9,7 @@ export class Queue {
   public requesterId: string | null;
   public isShuffled: boolean;
   public unshffledTracks: any[];
+  public playerMessage: Message | null;
 
   constructor() {
     this.tracks = [];
@@ -17,6 +20,7 @@ export class Queue {
     this.requesterId = null;
     this.isShuffled =  false;
     this.unshffledTracks = [];
+    this.playerMessage = null;
   }
 
   public enqueue (track: any): void {

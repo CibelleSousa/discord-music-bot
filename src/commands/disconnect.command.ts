@@ -31,6 +31,11 @@ export class DisconnectCommand {
             queue.timeout = null;
         }
 
+        if (queue.playerMessage) {
+            await queue.playerMessage.delete().catch(() => {});
+            queue.playerMessage = null;
+        }
+
         await this.audioService.shoukaku.leaveVoiceChannel(interaction.guildId!);
 
         return interaction.reply('🤸‍♂️ Fui desconectado! Até a próxima.');
