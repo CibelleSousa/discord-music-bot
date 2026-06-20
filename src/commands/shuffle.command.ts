@@ -22,7 +22,7 @@ export class ShuffleCommand {
             });
         }
 
-        queue.enabledShuffle();
+        queue.enableShuffle();
 
         // Algoritmo de Fisher-Yates para embaralhar o array
         for (let i = queue.tracks.length - 1; i > 0; i--) {

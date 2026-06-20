@@ -29,10 +29,10 @@ export class AudioService implements OnModuleInit {
     }
 
     // Nossa interface
-    public buildPlayerUi(track: any, isPaused: boolean = false, requesterId?: string | null) {
+    public buildPlayerUi(track: any, isPaused: boolean = false, queue: Queue) {
         const embed = new EmbedBuilder()
             .setColor('#2b2d31')
-            .setAuthor({ name: '🎵 Tocando Agora' })
+            .setAuthor({ name: '🎧 Tocando Agora' })
             .setTitle(`${track.info.author} - ${track.info.title}`)
             .setURL(track.info.uri || null)
 
@@ -55,54 +55,63 @@ export class AudioService implements OnModuleInit {
         const duration = track.info.isStream ? '🔴 AO VIVO' : formatTime(Number(track.info.length) || 0);
 
         let description = '';
-        if (requesterId) {
-            description += `👤 **Adicionado por:** <@${requesterId}>\n`;
+        if (queue.requesterId) {
+            description += `👤 **Adicionado por:** <@${queue.requesterId}>\n`;
         }
         description += `⏱️ **Duração:** \`${duration}\``;
         embed.setDescription(description);
 
+        let loopLabel = '◦';
+        let loopEmoji = '1517921153979519088';
+        let loopStyle = ButtonStyle.Secondary;
+
+        if (queue.loopMode === 'queue') {
+            loopLabel = '•';
+            loopStyle = ButtonStyle.Primary;
+        } else if (queue.loopMode === 'song') {
+            loopLabel = '•';
+            loopEmoji = '1517921184363053117';
+            loopStyle = ButtonStyle.Primary;
+        }
+
         const row1 = new ActionRowBuilder<ButtonBuilder>().addComponents(
             new ButtonBuilder()
+                .setCustomId('player_shuffle_toggle')
+                .setEmoji('1517921262444478585')
+                .setLabel(queue.isShuffled ? '•' : '◦')
+                .setStyle(queue.isShuffled ? ButtonStyle.Primary : ButtonStyle.Secondary),
+            new ButtonBuilder()
                 .setCustomId('player_back')
-                .setEmoji('⏪')
+                .setEmoji('1517921284250538094')
                 .setLabel('Voltar')
                 .setStyle(ButtonStyle.Secondary),
             new ButtonBuilder()
                 .setCustomId('player_pause')
-                .setEmoji('⏯')
+                .setEmoji(isPaused? '1517921129065611357' : '1517921073369186535')
                 .setLabel(isPaused ? 'Retomar' : 'Pausar')
-                .setStyle(isPaused ? ButtonStyle.Success : ButtonStyle.Secondary),
+                .setStyle(isPaused ? ButtonStyle.Primary : ButtonStyle.Secondary),
             new ButtonBuilder()
                 .setCustomId('player_skip')
-                .setEmoji('⏩')
+                .setEmoji('1517921303825350796')
                 .setLabel('Pular')
                 .setStyle(ButtonStyle.Secondary),
             new ButtonBuilder()
-                .setCustomId('player_stop')
-                .setEmoji('⏹️')
-                .setLabel('Parar')
-                .setStyle(ButtonStyle.Secondary)
+                .setCustomId('player_loop_toggle')
+                .setEmoji(loopEmoji)
+                .setLabel(loopLabel)
+                .setStyle(loopStyle),
+            
         );
 
         const row2 = new ActionRowBuilder<ButtonBuilder>().addComponents(
             new ButtonBuilder()
-                .setCustomId('player_shuffle')
-                .setEmoji('🔀')
-                .setLabel('Embaralhar')
-                .setStyle(ButtonStyle.Secondary),
-            new ButtonBuilder()
-                .setCustomId('player_unshuffle')
-                .setEmoji('🔄')
-                .setLabel('Restaurar')
-                .setStyle(ButtonStyle.Secondary),
-            new ButtonBuilder()
-                .setCustomId('player_loop')
-                .setEmoji('🔁')
-                .setLabel('Loop: Desativado') // Deixamos o label dinâmico no futuro
+                .setCustomId('player_stop')
+                .setEmoji('1517921328978727134')
+                .setLabel('Parar')
                 .setStyle(ButtonStyle.Secondary)
         );
 
-        return { embeds: [embed], components: [row1, row2] };
+        return { embeds: [embed], components: [row1, row2], allowedMentions: { parse: [] } };
     }
 
     // Esse método roda automaticamente assim que o bot liga

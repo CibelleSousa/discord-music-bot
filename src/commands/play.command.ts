@@ -122,7 +122,7 @@ export class PlayCommand {
           if (queue.playerMessage) {
             await queue.playerMessage.delete().catch(() => {});
           }
-          const ui = this.audioService.buildPlayerUi(nextTrack, false, queue.requesterId);
+          const ui = this.audioService.buildPlayerUi(nextTrack, false, queue);
           const msg = await queue.textChannel.send(ui);
           queue.playerMessage = msg;
         } else {
@@ -157,7 +157,7 @@ export class PlayCommand {
       const nextTrack = queue.next();
       await player.playTrack({ track: {encoded: nextTrack.encoded } });
 
-      const ui = this.audioService.buildPlayerUi(nextTrack, false);
+      const ui = this.audioService.buildPlayerUi(nextTrack, false, queue);
       const msg = await queue.textChannel.send(ui);
       queue.playerMessage = msg;
     }

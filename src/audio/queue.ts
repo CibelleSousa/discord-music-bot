@@ -10,6 +10,8 @@ export class Queue {
   public isShuffled: boolean;
   public unshffledTracks: any[];
   public playerMessage: Message | null;
+  public loopMode: 'off' | 'queue' | 'song';
+  public history: any[];
 
   constructor() {
     this.tracks = [];
@@ -21,6 +23,8 @@ export class Queue {
     this.isShuffled =  false;
     this.unshffledTracks = [];
     this.playerMessage = null;
+    this.loopMode = 'off';
+    this.history = [];
   }
 
   public enqueue (track: any): void {
@@ -28,6 +32,20 @@ export class Queue {
   }
 
   public next(): any | null {
+    if (this.currentTrack) {
+      if (this.loopMode === 'song'){
+        return this.currentTrack;
+      }
+      if (this.loopMode === 'queue') {
+        this.tracks.push(this.currentTrack);
+      }
+      this.history.push(this.currentTrack);
+      // Limitando a quantidade de música para não pesar a memória RAM
+      if (this.history.length > 15) {
+        this.history.shift(); 
+      }
+    }
+
     if (this.tracks.length === 0) {
         this.currentTrack = null;
         return null
@@ -39,7 +57,7 @@ export class Queue {
     return nextTrack;
   }
 
-  public enabledShuffle(): void {
+  public enableShuffle(): void {
     if(this.isShuffled) return;
     this.unshffledTracks = [...this.tracks];
     this.isShuffled = true;
